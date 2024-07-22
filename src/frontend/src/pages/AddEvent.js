@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import debounce from 'lodash/debounce';
 // take project input form
 function AddEvent() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [venue, setvenue] = useState();
-  const [time, settime] = useState();
+  const [starttime, setstarttime] = useState();
+  const [endtime, setendtime] = useState();
   const [images, setImages] = useState([]);
   const [date,setdate]=useState();
   const [instagram,setinstagram]=useState('')
@@ -15,7 +17,8 @@ function AddEvent() {
   const[gform,setgform]=useState('')
   const[response,setresponse]=useState('')
   const[error,seterror]=useState('')
-
+  const [locations, setlocations] = useState([])
+  const [location,setlocation]=useState()
   const[event,setevent]=useState('')
   const navigate = useNavigate();
 
@@ -27,12 +30,13 @@ function AddEvent() {
     formData.append('title', title);
     formData.append('description', description);
     formData.append('date', date);
-    formData.append('time', time);
-    formData.append('venue', venue);
+    formData.append('starttime', starttime);
+    formData.append('endtime', endtime);
+    formData.append('location', location);
     formData.append('twitter', twitter);
     formData.append('instagram',instagram);
-    formData.append('linkedin', linkedin);
-    formData.append('gform', gform);
+    formData.append('whatsapp', linkedin);
+   
 
   
 
@@ -41,8 +45,9 @@ function AddEvent() {
     formData.append('thumbnail', thumbnailFile);
 
     console.log(formData)
+    console.log("postlocation",location)
     // Perform your axios POST request with FormData
-    await axios.post('/api/v1/events/create-event', formData)
+    await axios.post('/api/v1/beachcleanups/create-event', formData)
       .then(function (response) {
         console.log(response);
         seterror('');
@@ -110,6 +115,89 @@ function AddEvent() {
   }
 
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = axios.get('https://nominatim.openstreetmap.org/search?q=dadar&format=json');
+  //       console.log(response);
+  //       setlocations(response?.data);
+  //       console.log(locations);
+  //       console.log(locations);
+  //       console.log(locations);
+  //       console.log(locations);
+  //     } catch (error) {
+  //       console.log('error=', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [gform]);
+
+  // useEffect(()=>{const options = {
+  //   method: 'GET',
+  //   url: 'https://api.foursquare.com/v3/autocomplete',
+  //   headers: {
+  //     accept: 'application/json',
+  //     Authorization: 'fsq3x1y3OEV1aNPNV7IEv8fKRrxCMPu6VsDHAhT2EOuTe40='
+  //   },
+  //   params: {
+  //     query: `${location}`,              // Replace with your search query
+     
+  //   }
+  // }; 
+  // axios(options)
+  //   .then(response => {
+  //     console.log("api=",response.data);
+  //     setlocations(response?.data?.results)
+  //     console.log("locations",locations)
+  //     console.log("locations",locations)
+  //     console.log("locations",locations)
+
+  //   })
+  //   .catch(error => {
+  //     console.error(error);
+  //   });},[gform])
+
+
+  useEffect(() => {
+    const fetchLocations = debounce(async () => {
+      const options = {
+        method: 'GET',
+        url: 'https://api.foursquare.com/v3/autocomplete',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'fsq3x1y3OEV1aNPNV7IEv8fKRrxCMPu6VsDHAhT2EOuTe40='
+        },
+        params: {
+          query: gform,
+        }
+      };
+
+      try {
+        const response = await axios(options);
+        console.log("api=", response.data);
+        setlocations(response?.data?.results || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }, 500); // debounce for 500ms
+
+    if (gform) {
+      fetchLocations();
+    }
+
+    return () => {
+      fetchLocations.cancel();
+    };
+  }, [gform]);
+
+  const options = locations.map((loc) => ({
+    value: loc?.place?.name,
+    label: loc?.place?.name || loc?.text?.primary + " " + loc?.text?.secondary,
+  }));
+ 
+  console.log("location",location)
+
   return (
     <>
     {response &&    
@@ -137,6 +225,30 @@ function AddEvent() {
           {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
     
     <div className="bg-white shadow p-4 py-8">
+    <div className="container mx-auto px-4">
+    <div className="flex justify-between items-center mt-4">
+      <div className="space-x-4">
+      <button onClick={()=>{navigate('/today-events')}} className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Today
+          </button>
+          <button onClick={()=>{navigate('/upcoming-events')}}  className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Upcoming
+          </button>
+          <button onClick={()=>{navigate('/other-events')}} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Past
+          </button>
+          <button onClick={()=>{navigate('/add-event')}}className="bg-rose-500 hover:bg-rose-600 text-3xl text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Add Event
+          </button>
+      </div>
+    </div>
+    <h1 className="text-4xl font-bold text-gray-900 text-center leading-tight mb-2 pb-4 relative">
+      <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500"></span>
+    </h1>
+
+    
+  </div>
+
    
       <div className="heading text-center  text-2xl m-5 text-gray-800 bg-white">New Event</div>
       <div className="editor mx-auto w-10/12 flex flex-col text-gray-800 border border-gray-300 p-4 shadow-lg max-w-2xl">
@@ -176,8 +288,26 @@ function AddEvent() {
         <input  className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" type='date' id="date" value={date} onChange={(e)=>setdate(e.target.value)}></input>
         
 
-        <label for="timeInput">Time</label>
-<input type="time" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" id="timeInput" name="timeInput" value={time} onChange={(e)=>settime(e.target.value)}></input>
+        <label for="timeInput">Start Time</label>
+<input type="time" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" id="timeInput" name="timeInput" value={starttime} onChange={(e)=>setstarttime(e.target.value)}></input>
+
+
+<label for="timeInput">End Time</label>
+<input type="time" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" id="timeInput" name="timeInput" value={endtime} onChange={(e)=>setendtime(e.target.value)}></input>
+
+<label for="timeInput">Location</label>
+<input type="text" className="title bg-gray-100 border border-gray-300 border-b-0 p-2 mb-0 outline-none" placeholder='type location..' id="timeInput" name="timeInput" value={gform} onChange={(e)=>setgform(e.target.value)}></input>
+
+<select
+            title bg-gray-100 border border-gray-300 border-t-0 p-2 mb-4 outline-none
+            value={location}
+            onChange={(e) => setlocation(e.target.value)}
+          >
+            <option>Pick Location</option>
+            {locations.map((loc, index) => (
+              <option key={index} value={loc?.place?.name?loc?.place?.name:loc?.text?.primary+" "+loc?.text?.secondary}>{loc?.place?.name || loc?.text?.primary+" "+loc?.text?.secondary}</option>
+            ))}
+          </select>
 
              <label for="timeInput">Instagram Post(optional)</label>
 <input type="text" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" placeholder='paste instagram post link of event' id="timeInput" name="timeInput" value={instagram} onChange={(e)=>setinstagram(e.target.value)}></input>
@@ -185,21 +315,11 @@ function AddEvent() {
 <label for="timeInput">Twitter Post(optional)</label>
 <input type="text" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" placeholder='paste twitter post link of event' id="timeInput" name="timeInput" value={twitter} onChange={(e)=>settwitter(e.target.value)}></input>
 
-<label for="timeInput">LinkedIn Post(optional)</label>
+<label for="timeInput">Whatsapp Group(optional)</label>
 <input type="text" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" placeholder='paste linkedIn post link of event' id="timeInput" name="timeInput" value={linkedin} onChange={(e)=>setlinkedin(e.target.value)}></input>
-        
-<label for="timeInput">Google Form (optional)</label>
-<input type="text" className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none" placeholder='paste google form link of event' id="timeInput" name="timeInput" value={gform} onChange={(e)=>setgform(e.target.value)}></input>
+ 
            
        
-        <label >Venue</label>
-        <textarea  
-            className="title bg-gray-100 border border-gray-300 p-2 mb-4 outline-none"
-          spellCheck="false"
-          placeholder="add venue"
-          value={venue}
-          onChange={(e) => setvenue(e.target.value)}
-        ></textarea>
 
 
 

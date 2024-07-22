@@ -41,6 +41,13 @@ const eventSchema = new Schema({
                     type: String, //cloudinary url
                     required: true
                 },
+                participants: [
+                    {
+                        type: Schema.Types.ObjectId,
+                        ref: "User"
+                    }
+                ],
+    
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User"

@@ -8,7 +8,8 @@ import {createEvent,
     getOtherEvents,
     getEventById,
     getmyevents,
-    searchbytitle
+    searchbytitle,
+    joinevent
 
    
 } from "../controllers/event.controller.js"
@@ -42,6 +43,8 @@ router.route("/update-event/:eventId").patch(updateEventDetails);
 router.route("/delete-event/:eventId").delete(deleteEvent);
 
 router.route("/get-event/:eventId").get(getEventById);
+
+router.route("/joinevent/:eventId").patch(joinevent);
 
 
 router.route("/all-events").get(getAllEvents);

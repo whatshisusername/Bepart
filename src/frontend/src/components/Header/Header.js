@@ -36,41 +36,10 @@ const navItems = [
   },
   {
       name: "Signup",
-      slug: "/student-signup",
+      slug: "/signup",
       active: !authStatus,
-      currentactive:("/student-signup"===window.location.pathname)
+      currentactive:("/signup"===window.location.pathname)
   },
-  {
-    name: "Teacher Signup",
-    slug: "/teacher-signup",
-    active: !authStatus,
-    currentactive:("/teacher-signup"===window.location.pathname)
-},
-
-  {
-      name: "Courses",
-      slug: "/all-courses",
-      active: authStatus,
-      currentactive:("/all-courses"===window.location.pathname)
-  },
-  {
-    name: "Add Course",
-    slug: "/add-course",
-    active: (authStatus && userData?.userrole==1),
-    currentactive:("/add-course"===window.location.pathname)
-},
-{
-  name: "My Courses",
-  slug: "/my-courses",
-  active: authStatus,
-  currentactive:("/my-courses"===window.location.pathname)
-},
-{
-  name: "Hall Ticket",
-  slug: "/hallticket",
-  active: (authStatus && userData?.userrole==2),
-  currentactive:("/hallticket"===window.location.pathname)
-},
   ]
 
   const url = window.location.href;
@@ -84,12 +53,14 @@ const navItems = [
  
 
   return (
-    <header className='py-3 shadow bg-gray-300 h-20'>
+    <header className='py-3  bg-gray-50 h-20'>
       <Container>
         <nav className='flex'>
+        {userData&&<h1 className="text-2xl font-bold hover:text-white-500">
+                                Welcome {userData?.fullname}
+                            </h1>}
          
           <ul className='flex ml-auto'>
-            
           
 
             {/*going loop on navitems and display that item only which are active  */}
@@ -105,26 +76,11 @@ const navItems = [
               </li>
             ) : null
             )}
-            
-            {authStatus && (
-              <li className='mt-2'>
-                
-                <Dropdown/>
+             {authStatus && (
+              <li>
+                <UserIcon />
               </li>
             )}
-
-{authStatus && (
-              <li className='mt-0'>
-                
-                <NotificationIcon/>
-              </li>
-            )}
-             {/* if user status is active show this logout button */}
-             {
-              userData && 
-             <UserIcon/>
-                
-                }
                   {authStatus && (
               <li>
                 <LogoutBtn />

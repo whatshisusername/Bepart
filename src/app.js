@@ -92,7 +92,19 @@ app.get("/student-signup", (req, res) => {
   app.get("/event/:eventId", (req, res) => {
     res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
   });
-
+  app.get("/add-event-run", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+  app.get("/today-events-run", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+  app.get("/upcoming-events-run", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+  app.get("/other-events-run", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+  
 
 
 
@@ -122,6 +134,14 @@ import notificationRouter from './routes/notification.routes.js'
 import eventRouter from './routes/event.routes.js'
 
 import notesRouter from './routes/notes.routes.js'
+
+import applicationRouter from './routes/application.routes.js'
+
+import marksheetRouter from './routes/marksheet.routes.js'
+
+import beachcleanup from './routes/beachcleanup.routes.js'
+
+import run from './routes/run.routes.js'
 // route declaration
 
 
@@ -137,5 +157,12 @@ app.use('/api/v1/events',eventRouter)
 
 app.use('/api/v1/notes',notesRouter)
 
+app.use('/api/v1/applications',applicationRouter)
+
+app.use('/api/v1/marksheets',marksheetRouter)
+
+app.use('/api/v1/beachcleanups',beachcleanup)
+
+app.use('/api/v1/runs',run)
 
 export {app}

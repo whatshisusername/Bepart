@@ -517,6 +517,43 @@ const getmyevents = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {listofevents:events}, "List of my events all fetched successfully"));
 });
 
+
+
+const joinevent = asyncHandler(async (req, res) => {
+    const { eventId } = req.params
+
+    // in this user toggle on button
+    // if button is already false and it is toggled set it to true ,if true set it to false
+    // true=publish,false=unpublish
+
+   
+    const event = await Event.findById(eventId)
+    // Check if the user already exists in the students array
+    if (event.participants.includes(req.user._id)) {
+        return res.status(401).json(new ApiError(401,"participant already enrolled to course ",["participant already enrolled to course"]))
+    }
+
+    if (!event){
+        return res.status(401).json(new ApiError(401,"event donot exists ",["event donot exists"]))
+
+    }
+
+    const {participant}=req.user
+
+    // adding student to course
+    await Event.updateOne({ _id: eventId }, { $push: { participants: req.user._id } })
+
+    const newevent = await Event.findById(eventId)
+    // return response
+    return res.status(201).json(
+       new ApiResponse(200,{event:newevent},"patricipant added to event successfully")
+    )
+
+
+
+})
+
+
 export {
  createEvent,
  updateEventDetails,
@@ -527,5 +564,6 @@ export {
  getOtherEvents,
  getEventById,
  getmyevents,
- searchbytitle
+ searchbytitle,
+ joinevent
 };

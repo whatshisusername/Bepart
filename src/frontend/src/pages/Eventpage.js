@@ -15,7 +15,9 @@ export default function Eventpage() {
     const navigate=useNavigate();
     const [error, seterror] = useState('');
     const [response, setresponse] = useState('');
+    const [response1, setresponse1] = useState('');
     const [deleteresponse, setdeleteresponse] = useState('');
+    const [joined,setjoined]=useState('');
     const userData = useSelector((state) => state.auth.userData);
 
     const deleteevent =()=>{
@@ -43,7 +45,7 @@ export default function Eventpage() {
     
         // Fetch course details
                 console.log("hitting getevent byid")
-                axios.get(`/api/v1/events/get-event/${eventId}`)
+                axios.get(`/api/v1/runs/get-event/${eventId}`)
                     .then(response => {
                         console.log(response)
                         setresponse(response?.data?.message)
@@ -56,6 +58,21 @@ export default function Eventpage() {
                         console.error("Error fetching event:", error);
                     });
     
+                    axios.get(`/api/v1/beachcleanups/get-event/${eventId}`)
+                    .then(response => {
+                        console.log(response)
+                        setresponse(response?.data?.message)
+                        console.log((new Date(event?.events?.date)).getDay())
+                        setevent(response?.data?.data?.listofevents[0]);
+                      
+                        
+                    })
+                    .catch(error => {
+                        console.error("Error fetching event:", error);
+                    });
+    
+
+
     console.log(event)
     console.log(event)
     console.log(event.events)
@@ -63,11 +80,122 @@ export default function Eventpage() {
     const [deletingevent,setdeletingevent]=useState(false);
 
     const handleSuccessClose = () => {
-      setresponse('')
+      setresponse1('')
     };
+
+    const joinevent=()=>{
+      if (!userData){
+        setresponse("LOGIN PLEASE")
+      }
+
+      else if(event?.events?.endlocation){
+        axios.patch(`/api/v1/runs/joinevent/${eventId}`)
+                    .then(response => {
+                        console.log(response)
+                        setresponse1(response?.data?.message)
+                        console.log((new Date(event?.events?.date)).getDay())
+                        setevent(response?.data?.data?.event);
+                      
+                        
+                    })
+                    .catch(error => {
+                        console.error("Error fetching event:", error);
+                    });
+    
+              
+
+
+      }
+
+
+
+
+      else{
+        axios.patch(`/api/v1/beachcleanups/joinevent/${eventId}`)
+                    .then(response => {
+                        console.log(response)
+                        setresponse1(response?.data?.message)
+                        console.log((new Date(event?.events?.date)).getDay())
+                        setevent(response?.data?.data?.event);
+                      
+                        
+                    })
+                    .catch(error => {
+                        console.error("Error fetching event:", error);
+                    });
+    
+              
+
+      }
+
+
+    }
+
+    useEffect(()=>{
+
+      if (event?.events?.endlocation){
+        axios.get(`/api/v1/runs/joined/${eventId}`)
+                    .then(response => {
+                        console.log(response)
+                        setresponse(response?.data?.message)
+                        console.log((new Date(event?.events?.date)).getDay())
+                        setevent(response?.data?.data?.event);
+                        setjoined(true);
+                      
+                        
+                    })
+                    .catch(error => {
+                        console.error("Error fetching event:", error);
+                    });
+    
+
+
+      }
+    
+    else{axios.get(`/api/v1/beachcleanups/joined/${eventId}`)
+                    .then(response => {
+                        console.log(response)
+                        setresponse(response?.data?.message)
+                        console.log((new Date(event?.events?.date)).getDay())
+                        setevent(response?.data?.data?.event);
+                        setjoined(true);
+                      
+                        
+                    })
+                    .catch(error => {
+                        console.error("Error fetching event:", error);
+                    });
+                  }
+                    
+},[eventId])
+
+
 
     return (
         <>
+
+{response1 &&    
+             <div className="font-regular relative block w-full max-w-screen-md rounded-lg bg-green-500 px-4 py-4 text-base text-white ml-96" data-dismissible="alert">
+             <div className="absolute top-4 left-4">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="mt-px h-6 w-6">
+                 <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd"></path>
+               </svg>
+             </div>
+             <div className="ml-8 mr-12">
+               <h5 className="block font-sans text-xl font-semibold leading-snug tracking-normal text-white antialiased">Success</h5>
+               <p className="mt-2 block font-sans text-base font-normal leading-relaxed text-white antialiased">{response1}</p>
+             </div>
+             <div data-dismissible-target="alert" data-ripple-dark="true" className="absolute top-3 right-3 w-max rounded-lg transition-all hover:bg-white hover:bg-opacity-20">
+               <div role="button" className="w-max rounded-lg p-1" onClick={handleSuccessClose}>
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                 </svg>
+               </div>
+             </div>
+           </div>
+
+
+       }
         
         {deleteresponse &&    
              <div className="font-regular relative block w-full max-w-screen-md rounded-lg bg-green-500 px-4 py-4 text-base text-white ml-96" data-dismissible="alert">
@@ -190,38 +318,21 @@ export default function Eventpage() {
             <a class="ml-2 text-gray-500 mt-1" href={event?.events?.twitter} target="_blank">
             <svg width="40px" height="40px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"><path fill="#1D9BF0" d="M13.567 5.144c.008.123.008.247.008.371 0 3.796-2.889 8.173-8.172 8.173v-.002A8.131 8.131 0 011 12.398a5.768 5.768 0 004.25-1.19 2.876 2.876 0 01-2.683-1.995c.431.083.875.066 1.297-.05A2.873 2.873 0 011.56 6.348v-.036c.4.222.847.345 1.304.36a2.876 2.876 0 01-.89-3.836 8.152 8.152 0 005.92 3 2.874 2.874 0 014.895-2.619 5.763 5.763 0 001.824-.697 2.883 2.883 0 01-1.262 1.588A5.712 5.712 0 0015 3.656a5.834 5.834 0 01-1.433 1.488z"/></svg>
             </a>
-            <a class="ml-2 text-gray-500" href={event?.events?.linkedin} target="_blank">
-            <svg width="40px" height="40px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"><path fill="#0A66C2" d="M12.225 12.225h-1.778V9.44c0-.664-.012-1.519-.925-1.519-.926 0-1.068.724-1.068 1.47v2.834H6.676V6.498h1.707v.783h.024c.348-.594.996-.95 1.684-.925 1.802 0 2.135 1.185 2.135 2.728l-.001 3.14zM4.67 5.715a1.037 1.037 0 01-1.032-1.031c0-.566.466-1.032 1.032-1.032.566 0 1.031.466 1.032 1.032 0 .566-.466 1.032-1.032 1.032zm.889 6.51h-1.78V6.498h1.78v5.727zM13.11 2H2.885A.88.88 0 002 2.866v10.268a.88.88 0 00.885.866h10.226a.882.882 0 00.889-.866V2.865a.88.88 0 00-.889-.864z"/></svg>
-            </a>
-            <a class="ml-2 text-gray-500 mt-1" href={event?.events?.gform} target="_blank">
-            <svg
-      version="1.1"
-      id="Layer_1"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      x="0px"
-      y="0px"
-      width='30px'
-      viewBox="0 0 512 512"
-      style={{ enableBackground: 'new 0 0 512 512' }}
-      xmlSpace="preserve"
-    >
-      <path style={{ fill: '#7A51CC' }} d="M439.652,512H72.348c-9.217,0-16.696-7.479-16.696-16.696V16.696C55.652,7.479,63.131,0,72.348,0 h233.739c4.424,0,8.674,1.761,11.804,4.892l133.565,133.565c3.131,3.13,4.892,7.379,4.892,11.804v345.043 C456.348,504.521,448.869,512,439.652,512z"/>
-      <path style={{ fill: '#5947B3' }} d="M317.891,4.892C314.761,1.761,310.511,0,306.087,0H256v512h183.652 c9.217,0,16.696-7.479,16.696-16.696V150.261c0-4.424-1.761-8.674-4.892-11.804L317.891,4.892z"/>
-      <path style={{ fill: '#7A51CC' }} d="M451.459,138.459L317.891,4.892C314.76,1.76,310.511,0,306.082,0h-16.691l0.001,150.261 c0,9.22,7.475,16.696,16.696,16.696h150.26v-16.696C456.348,145.834,454.589,141.589,451.459,138.459z"/>
-      <g>
-        <circle style={{ fill: '#FFFFFF' }} cx="139.13" cy="261.565" r="16.696"/>
-        <circle style={{ fill: '#FFFFFF' }} cx="139.13" cy="328.348" r="16.696"/>
-        <circle style={{ fill: '#FFFFFF' }} cx="139.13" cy="395.13" r="16.696"/>
-        <path style={{ fill: '#FFFFFF' }} d="M372.87,411.826H205.913c-9.217,0-16.696-7.479-16.696-16.696 c0-9.217,7.479-16.696,16.696-16.696H372.87c9.217,0,16.696,7.479,16.696,16.696C389.565,404.348,382.087,411.826,372.87,411.826z"/>
-      </g>
-      <path style={{ fill: '#E6F3FF' }} d="M372.87,378.435H256v33.391h116.87c9.217,0,16.696-7.479,16.696-16.696 C389.565,385.913,382.087,378.435,372.87,378.435z"/>
-      <path style={{ fill: '#FFFFFF' }} d="M372.87,345.043H205.913c-9.217,0-16.696-7.479-16.696-16.696 c0-9.217,7.479-16.696,16.696-16.696H372.87c9.217,0,16.696,7.479,16.696,16.696C389.565,337.565,382.087,345.043,372.87,345.043z"/>
-      <path style={{ fill: '#E6F3FF' }} d="M372.87,311.652H256v33.391h116.87c9.217,0,16.696-7.479,16.696-16.696 C389.565,319.131,382.087,311.652,372.87,311.652z"/>
-      <path style={{ fill: '#FFFFFF' }} d="M372.87,278.261H205.913c-9.217,0-16.696-7.479-16.696-16.696 c0-9.217,7.479-16.696,16.696-16.696H372.87c9.217,0,16.696,7.479,16.696,16.696C389.565,270.782,382.087,278.261,372.87,278.261z"/>
-      <path style={{ fill: '#E6F3FF' }} d="M372.87,244.87H256v33.391h116.87c9.217,0,16.696-7.479,16.696-16.696 C389.565,252.348,382.087,244.87,372.87,244.87z"/>
+            <a class="ml-2 text-gray-500" href={event?.events?.whatsapp} target="_blank">
+            <svg width="40px" height="40px" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fillRule="evenodd" clipRule="evenodd" d="M16 31C23.732 31 30 24.732 30 17C30 9.26801 23.732 3 16 3C8.26801 3 2 9.26801 2 17C2 19.5109 2.661 21.8674 3.81847 23.905L2 31L9.31486 29.3038C11.3014 30.3854 13.5789 31 16 31ZM16 28.8462C22.5425 28.8462 27.8462 23.5425 27.8462 17C27.8462 10.4576 22.5425 5.15385 16 5.15385C9.45755 5.15385 4.15385 10.4576 4.15385 17C4.15385 19.5261 4.9445 21.8675 6.29184 23.7902L5.23077 27.7692L9.27993 26.7569C11.1894 28.0746 13.5046 28.8462 16 28.8462Z" fill="#BFC8D0"/>
+      <path d="M28 16C28 22.6274 22.6274 28 16 28C13.4722 28 11.1269 27.2184 9.19266 25.8837L5.09091 26.9091L6.16576 22.8784C4.80092 20.9307 4 18.5589 4 16C4 9.37258 9.37258 4 16 4C22.6274 4 28 9.37258 28 16Z" fill="url(#paint0_linear_87_7264)"/>
+      <path fillRule="evenodd" clipRule="evenodd" d="M16 30C23.732 30 30 23.732 30 16C30 8.26801 23.732 2 16 2C8.26801 2 2 8.26801 2 16C2 18.5109 2.661 20.8674 3.81847 22.905L2 30L9.31486 28.3038C11.3014 29.3854 13.5789 30 16 30ZM16 27.8462C22.5425 27.8462 27.8462 22.5425 27.8462 16C27.8462 9.45755 22.5425 4.15385 16 4.15385C9.45755 4.15385 4.15385 9.45755 4.15385 16C4.15385 18.5261 4.9445 20.8675 6.29184 22.7902L5.23077 26.7692L9.27993 25.7569C11.1894 27.0746 13.5046 27.8462 16 27.8462Z" fill="white"/>
+      <path d="M12.5 9.49989C12.1672 8.83131 11.6565 8.8905 11.1407 8.8905C10.2188 8.8905 8.78125 9.99478 8.78125 12.05C8.78125 13.7343 9.52345 15.578 12.0244 18.3361C14.438 20.9979 17.6094 22.3748 20.2422 22.3279C22.875 22.2811 23.4167 20.0154 23.4167 19.2503C23.4167 18.9112 23.2062 18.742 23.0613 18.696C22.1641 18.2654 20.5093 17.4631 20.1328 17.3124C19.7563 17.1617 19.5597 17.3656 19.4375 17.4765C19.0961 17.8018 18.4193 18.7608 18.1875 18.9765C17.9558 19.1922 17.6103 19.083 17.4665 19.0015C16.9374 18.7892 15.5029 18.1511 14.3595 17.0426C12.9453 15.6718 12.8623 15.2001 12.5959 14.7803C12.3828 14.4444 12.5392 14.2384 12.6172 14.1483C12.9219 13.7968 13.3426 13.254 13.5313 12.9843C13.7199 12.7145 13.5702 12.305 13.4803 12.05C13.0938 10.953 12.7663 10.0347 12.5 9.49989Z" fill="white"/>
+      <defs>
+        <linearGradient id="paint0_linear_87_7264" x1="26.5" y1="7" x2="4" y2="28" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#5BD066"/>
+          <stop offset="1" stopColor="#27B43E"/>
+        </linearGradient>
+      </defs>
     </svg>
             </a>
+           
           </span>
         </div>
         <div class="flex mt-6 items-center pb-5 border-b-2 border-gray-200 mb-5">
@@ -256,16 +367,43 @@ export default function Eventpage() {
 <path d="M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z" fill="#2F88FF" stroke="#000000" stroke-width="4" stroke-linejoin="round"/>
 <path d="M24.0083 12L24.0071 24.0088L32.4865 32.4882" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-          {event?.events?.time}</span>
-          <span class="title-font font-medium text-2xl ml-8 text-gray-900">
+          {event?.events?.starttime}-{event?.events?.endtime}</span>
+          {/* <span class="title-font font-medium text-2xl ml-8 text-blue-500">
           <svg width="20px" height="20px" viewBox="-5.07 0 43.012 43.012" xmlns="http://www.w3.org/2000/svg">
   <path id="location" d="M406.185,260.012c-18.028-13.493-16.233-28.572-16.233-28.572h11.184a4.7,4.7,0,0,0-.142,1.1,5.378,5.378,0,0,0,.466,2.1,7.353,7.353,0,0,0,2.622,2.615,5,5,0,0,0,4.218,0,7.316,7.316,0,0,0,2.619-2.615,5.4,5.4,0,0,0,.465-2.105,4.728,4.728,0,0,0-.141-1.1h11.5S424.217,246.277,406.185,260.012Zm4.731-29.576a7.353,7.353,0,0,0-2.619-2.618,4.977,4.977,0,0,0-4.211,0,7.389,7.389,0,0,0-2.622,2.618,6.468,6.468,0,0,0-.326,1H389.966c0-7.972,7.335-14.435,16.383-14.435s16.383,6.463,16.383,14.435H411.242A6.523,6.523,0,0,0,410.915,230.436Z" transform="translate(-389.902 -217)" fill="#2d5be2"/>
-</svg>{event?.events?.venue}</span>
-           
+</svg>{event?.events?.location || event?.events?.startlocation}-{event?.events?.endlocation}</span> */}
+<div class="w-1/2 text-1xl text-blue-600">
+                {/* <svg width="20px" height="20px" viewBox="-5.07 0 43.012 43.012" xmlns="http://www.w3.org/2000/svg">
+  <path id="location" d="M406.185,260.012c-18.028-13.493-16.233-28.572-16.233-28.572h11.184a4.7,4.7,0,0,0-.142,1.1,5.378,5.378,0,0,0,.466,2.1,7.353,7.353,0,0,0,2.622,2.615,5,5,0,0,0,4.218,0,7.316,7.316,0,0,0,2.619-2.615,5.4,5.4,0,0,0,.465-2.105,4.728,4.728,0,0,0-.141-1.1h11.5S424.217,246.277,406.185,260.012Zm4.731-29.576a7.353,7.353,0,0,0-2.619-2.618,4.977,4.977,0,0,0-4.211,0,7.389,7.389,0,0,0-2.622,2.618,6.468,6.468,0,0,0-.326,1H389.966c0-7.972,7.335-14.435,16.383-14.435s16.383,6.463,16.383,14.435H411.242A6.523,6.523,0,0,0,410.915,230.436Z" transform="translate(-389.902 -217)" fill="#2d5be2"/>
+</svg> */}
+<img src='https://thumbs.dreamstime.com/b/start-location-pin-as-vector-illustration-231741521.jpg' className='h-20'></img>{event?.events?.startlocation || event?.events?.location}
+                </div>
+                
+                
+                
+                  {event?.events?.endlocation &&<div class="w-1/2 text-1xl text-blue-600">
+                {/* <svg width="20px" height="20px" viewBox="-5.07 0 43.012 43.012" xmlns="http://www.w3.org/2000/svg">
+  <path id="location" d="M406.185,260.012c-18.028-13.493-16.233-28.572-16.233-28.572h11.184a4.7,4.7,0,0,0-.142,1.1,5.378,5.378,0,0,0,.466,2.1,7.353,7.353,0,0,0,2.622,2.615,5,5,0,0,0,4.218,0,7.316,7.316,0,0,0,2.619-2.615,5.4,5.4,0,0,0,.465-2.105,4.728,4.728,0,0,0-.141-1.1h11.5S424.217,246.277,406.185,260.012Zm4.731-29.576a7.353,7.353,0,0,0-2.619-2.618,4.977,4.977,0,0,0-4.211,0,7.389,7.389,0,0,0-2.622,2.618,6.468,6.468,0,0,0-.326,1H389.966c0-7.972,7.335-14.435,16.383-14.435s16.383,6.463,16.383,14.435H411.242A6.523,6.523,0,0,0,410.915,230.436Z" transform="translate(-389.902 -217)" fill="#ff0000"/>
+</svg> */}
+<img src="https://img.freepik.com/premium-vector/finish-flag_592324-15308.jpg" className='h-20'></img>{event?.events?.endlocation}
+                </div>}
+
           </div>
         </div>
         <p class="leading-relaxed">{event?.events?.description}</p>
-       
+
+       {/* {!joined&& event?.events?.endlocation &&<button
+        onClick={joinevent}
+    class="nav-button hover:drop-shadow-lg flex w-fit items-center justify-center rounded-full border border-[#0c550c] bg-[#d3e763] bg-gradient-to-tr from-[#97f163] to-[#78c048]/70 px-7 py-2.5 text-base font-bold text-slate-800 ring-lime-600 ring-offset-2 ring-offset-slate-700 drop-shadow-[0px_1px_2px_rgb(0,0,0,0.3)] active:ring-1 mt-4">
+    <span>Join now</span>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="ml-2" height="1em"
+      width="1em" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd"
+        d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z">
+      </path>
+    </svg>
+  </button>}
+        */}
       </div>
     </div>
   </div>

@@ -5,12 +5,16 @@ import React, { useState ,useEffect} from "react";
 import { useSelector } from "react-redux";
 import EventCard from "../components/EventCard";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const OtherEvents = () => {
 
   const [events, setevents] = useState([])
   var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
   
 var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+
+const navigate=useNavigate();
     
 const [search,setsearch]=useState('')
 const[searching,setsearching]=useState(false)
@@ -22,7 +26,7 @@ const [searchedevents, setsearchedevents] = useState([])
     const userData = useSelector((state) => state.auth.userData);
 
     useEffect(()=>{
-      axios.get('/api/v1/events/other-events')
+      axios.get('/api/v1/beachcleanups/other-events')
     .then(function (response) {
       console.log(response);
       setevents(response?.data?.data?.listofevents)
@@ -55,6 +59,29 @@ console.log("error=",error);
   if(events.length===0){
     return (
       <>
+      <div className="container mx-auto px-4">
+    <div className="flex justify-between items-center mt-4">
+      <div className="space-x-4">
+      <button onClick={()=>{navigate('/today-events')}} className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Today
+          </button>
+          <button onClick={()=>{navigate('/upcoming-events')}}  className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Upcoming
+          </button>
+          <button onClick={()=>{navigate('/other-events')}} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Past
+          </button>
+          <button onClick={()=>{navigate('/add-event')}}className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Add Event
+          </button>
+      </div>
+    </div>
+    <h1 className="text-4xl font-bold text-gray-900 text-center leading-tight mb-2 pb-4 relative">
+      <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">Events</span>
+    </h1>
+    
+    
+  </div>
       <h1 class="mb-4 mt-64 text-3xl text-center font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-4xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">No Events Yet</span> </h1>
       </>
     )
@@ -62,9 +89,32 @@ console.log("error=",error);
 
   return (
     <>
-
+    
 <div className="pt-2 relative mx-auto text-gray-600">
-        <input
+<div className="container mx-auto px-4">
+    <div className="flex justify-between items-center mt-4">
+      <div className="space-x-4">
+      <button onClick={()=>{navigate('/today-events')}} className="bg-indigo-500 hover:bg-indigo-600  text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Today
+          </button>
+          <button onClick={()=>{navigate('/upcoming-events')}}  className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Upcoming
+          </button>
+          <button onClick={()=>{navigate('/other-events')}} className="bg-orange-500 hover:bg-orange-600 text-3xl text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Past
+          </button>
+          <button onClick={()=>{navigate('/add-event')}}className="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+            Add Event
+          </button>
+      </div>
+    </div>
+    <h1 className="text-4xl font-bold text-gray-900 text-center leading-tight mb-2 pb-4 relative">
+    </h1>
+    
+
+    
+  </div>
+        {/* <input
           className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
           type="search"
           name="search"
@@ -90,11 +140,11 @@ console.log("error=",error);
           >
             <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
           </svg>
-        </button>
+        </button> */}
       </div>
-<h1 class="mb-4 mt-8 ml-0 text-3xl font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-4xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">Other Events</span> </h1>
-<div class="h-fit flex  items-center justify-center bg-gray-200 mt-0 mb-8 ">
-  <div class="grid grid-cols-4 gap-4 gap-y-4 w-50 ">
+      <h1 class="mb-4 text-3xl text-center font-extrabold text-gray-900 dark:text-white md:text-4xl lg:text-4xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">Past Events</span> </h1>
+<div class="h-fit flex  items-center justify-center mt-0 mb-8 ">
+  <div class="grid grid-cols-1 gap-4 gap-y-8 w-50 ">
 
   {searching&&searchedevents.length>0?(searchedevents.map((events)=>
         (

@@ -283,6 +283,156 @@ const registerUser2 = asyncHandler(async (req,res)=>{
     
 })
 
+
+const googlesignup = asyncHandler(async (req,res)=>{
+    // get user details from front end
+    // validate user details got  from front end
+    //check if user already exists :do this by checking username ,email else donot create user if not unqiue
+    // check if avatar is sent by user and uploaded by multer on our local public/temp folder else ask for details again
+    // if avatar exists add it to cloudinary ,check if successfully added to cloudinary 
+    // create user object add all details in mongodb
+    // check for user creation in db
+    // remove password and  refresh token from response sent by mongodb
+    // return response
+
+
+    // get user details from front end ,from body this through express
+    const {email,fullname,avatar}=req.body;
+
+    // console.log(req.body)
+    //  validate user details got  from front end
+
+    // must be not empty
+    if (fullname===""){
+        return res.status(404).json(
+            new ApiError(404,"fullname is required",["fullname is required"])
+         )
+    }
+    if (email===""){
+        return res.status(404).json(new ApiError(404,"email is required",['email is required']))
+    }
+
+    
+    //check if user already exists :do this by checking username ,email else donot create user if not unqiue
+    // we check this in database where User collection(model) is created which stores all users
+    // checking either user with same username exists or email
+
+    const existuser = await User.findOne({email:email})
+
+    if(existuser){
+        
+
+    // password match generate tokens
+    console.log("going acess token")
+
+    const {accessToken,refreshToken}= await generateAccessandRefreshToken(existuser._id)
+
+    console.log("return acess token","refresh",refreshToken,"accesstoken",accessToken)
+
+    
+    const loggedinuser = await User.findById(existuser._id).select(" -refreshToken")
+
+    console.log(loggedinuser)
+
+    // making cookies
+    // doing this cookie is just readable by frontend cannot modify it,server can modify it
+    const options ={
+        httpOnly:true,
+        secure:true,
+        expires: new Date(Date.now() + 86400000)
+    }
+
+    // .cookie used to add cookie in response
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200, 
+            {
+                user: loggedinuser, accessToken, refreshToken
+            },
+            "User logged In Successfully"
+        )
+    )
+
+    }
+
+    
+    // check if avatar is sent by user and uploaded by multer on our local public/temp folder else ask for details again
+
+    // this is given by multer
+    // console.log(req.files)
+
+
+
+    
+    
+
+    //  add user details to database
+
+    const user = await User.create({
+        email:email,
+        fullname:fullname,
+        avatar:avatar || ""})
+
+    // check for user creation in db
+    // remove password and  refresh token from response sent by mongodb
+
+    // checking if just added user in database exits or not also if exists remove its password and refreshToken
+    // select method selects all fields of that model "-varibale" from this that variable will be deselected
+    const createduser = await User.findById(user._id)    
+    if (!createduser){
+
+        return res.status(404).json(new ApiError(500,"something went wrong while adding user to database",["something went wrong while adding user to database"]));
+    }
+
+     // password match generate tokens
+    console.log("going acess token")
+
+    const {accessToken,refreshToken}= await generateAccessandRefreshToken(createduser._id)
+
+    console.log("return acess token","refresh",refreshToken,"accesstoken",accessToken)
+
+    
+    const loggedinuser = await User.findById(createduser._id).select(" -refreshToken")
+
+    console.log(loggedinuser)
+
+    // making cookies
+    // doing this cookie is just readable by frontend cannot modify it,server can modify it
+    const options ={
+        httpOnly:true,
+        secure:true,
+        expires: new Date(Date.now() + 86400000)
+    }
+
+    // .cookie used to add cookie in response
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200, 
+            {
+                user: loggedinuser, accessToken, refreshToken
+            },
+            "User logged In Successfully"
+        )
+    )
+
+
+
+
+
+    
+})
+
+
+
+
 const checkuserexists = asyncHandler(async(req,res)=>{
 
     const {registrationId}= req.body
@@ -554,6 +704,28 @@ const getCurrentUser = asyncHandler(async(req, res) => {
 })
 
 
+const getuser = asyncHandler(async(req, res) => {
+    const {userid} = req.params
+
+    const user=await User.findById(userid);
+
+    if(!user){
+        return res.status(404).json(
+            new ApiError(404,"user not found",["user not found"])
+         )
+
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        {user:user},
+        "User fetched successfully"
+    ))
+})
+
+
+
 const updateAccountDetails = asyncHandler(async(req, res) => {
     const {fullname, email,branch,semester} = req.body
 
@@ -808,4 +980,6 @@ export {registerUser,
     getWatchHistory,
     checkuserexists,
     registerUser2,
+    getuser,
+    googlesignup,
 };

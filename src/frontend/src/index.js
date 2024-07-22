@@ -28,6 +28,14 @@ import OtherEvents from './pages/OtherEvents.js'
 import Eventpage from './pages/Eventpage.js'
 import MyEvents from './pages/MyEvents.js'
 import HallTicket from './pages/HallTicket.js'
+import Marksheet from './pages/Marksheet.js'
+import Applications from './pages/Applications.js'
+import Applicant from './pages/Applicant.js'
+import UpcomingEvents from './pages/UpcomingEvents.js'
+import AddRun from './pages/AddRun.js'
+import TodayRun from './pages/TodayRun.js'
+import UpcomingRun from './pages/UpcomingRun.js'
+import OtherRun from './pages/OtherRun.js'
 
 const router = createBrowserRouter([
   {
@@ -40,7 +48,7 @@ const router = createBrowserRouter([
     },
         
         {
-            path: "/student-signup",
+            path: "/signup",
             element: (
                     <Signup />
             ),
@@ -103,6 +111,30 @@ const router = createBrowserRouter([
   ),
 },
 {
+  path: "/marksheet",
+  element: (
+      
+          <Marksheet />
+     
+  ),
+},
+{
+  path: "/applications",
+  element: (
+      
+          <Applications />
+     
+  ),
+},
+{
+  path: "/applicant/:applicantid",
+  element: (
+      
+          <Applicant />
+     
+  ),
+},
+{
   path: "/course/:courseId",
   element: <Coursepage />,
 },
@@ -138,6 +170,14 @@ element: (
   ),
   },
 
+  {
+    path: "/upcoming-events",
+    element: (
+        
+            <UpcomingEvents/>
+    ),
+    },
+
 {
   path: "/add-event",
   element: (
@@ -145,7 +185,36 @@ element: (
           <AddEvent/>
   ),
   },
-
+  {
+    path: "/add-event-run",
+    element: (
+        
+            <AddRun/>
+    ),
+    },
+    {
+      path: "/today-events-run",
+      element: (
+          
+              <TodayRun/>
+      ),
+      },
+      {
+        path: "/upcoming-events-run",
+        element: (
+            
+                <UpcomingRun/>
+        ),
+        },
+  
+        {
+          path: "/other-events-run",
+          element: (
+              
+                  <OtherRun/>
+          ),
+          },
+    
   {
     path: "/my-events",
     element: (
