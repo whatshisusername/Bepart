@@ -1,7 +1,8 @@
 # Bepart  
-
-Bepart is an innovative web application designed to connect individuals with meaningful events like beach cleanups, marathons, and small runs. It empowers users to discover and participate in local initiatives or host their own events, fostering community engagement and contribution.  
-
+<img src="https://github.com/user-attachments/assets/e13ad331-4a68-4444-832f-8144a1601943" width="250" height="250">
+is an innovative web application designed to connect individuals with meaningful events like beach cleanups, marathons, and small runs. It empowers users to discover and participate in local initiatives or host their own events, fostering community engagement and contribution.  
+<!-- ![bepart-high-resolution-logo](https://github.com/user-attachments/assets/e13ad331-4a68-4444-832f-8144a1601943)
+ -->
 ---
 
 ## Tech Stack  
